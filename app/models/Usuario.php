@@ -1,6 +1,7 @@
 <?php
 
     class Usuario{
+    	//PRIS
         private $db;
 
         public function __construct(){
