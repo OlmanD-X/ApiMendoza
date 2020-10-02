@@ -7,7 +7,7 @@
         public function getUsers(){
             header('Access-Control-Allow-Origin:*');
             header('Content-Type: application/json');
-            $arraycito = array('Nombre'=>'Olman','Apellido'=>'Quispe','Usuario'=>'olmand');
+            $arraycito = array('Nombre'=>'Olman','Apellido'=>'Quispe','Usuario'=>'olmanDaniel');
             echo json_encode($arraycito);
             // $data = $this->modelUsuarios->getUsuarios();
 
