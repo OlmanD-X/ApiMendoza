@@ -7,7 +7,7 @@
 
         private $dbh; //databse handler
         private $stmt; //statement
-        private $error;
+        public $error;
 
         public function __construct(){
             $dsn = 'mysql:host='.$this->host.';dbname='.$this->db_name;
@@ -16,10 +16,9 @@
             );
             
             try {
-                $this->dbh = new PDO($dsn,"","",$options);
+                $this->dbh = new PDO($dsn,$this->user,$this->password,$options);
             } catch (PDOException $e) {
                 $this->error = $e->getMessage();
-                echo 'Error:'.$this->error;
             }
         }
 
