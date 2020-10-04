@@ -135,9 +135,6 @@
             case 'Alfa':
                 $regex = '/^[a-zA-Z]+(\.?\s?[a-zA-Z]*)*/';
                 break;
-            case 'Letras':
-                $regex = '/^[a-zA-Z]+/';
-                break;
             default:
                 # code...
                 break;
@@ -174,4 +171,12 @@
             }
         }
         throwError(ATHORIZATION_HEADER_NOT_FOUND,'Access Token Not Found');
+    }
+
+    function validateFormula($value){
+        $regex = '/(\(?\-?[A-Za-z0-9]){1}([-^+*\/]\(?\-?[A-Za-z0-9]{1}\)?)*/';
+        if(!preg_match($regex,$value)){
+            throwError(PARAMETER_IS_INVALID,'La fórmula no es válida');
+        }
+        return $value;
     }

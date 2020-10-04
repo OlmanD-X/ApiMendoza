@@ -44,6 +44,7 @@
 
         public function validateToken(){
             try {
+                require_once '../app/models/User.php';
                 $token = getBearerToken();
                 $payload = JWT::decode($token,SECRETE_KEY,['HS256']);
                 $id = $payload->userId;
