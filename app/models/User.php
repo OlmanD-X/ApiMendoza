@@ -19,4 +19,24 @@
             }
             
         }
+
+        public function setToken($token){
+            try {
+                $this->db->query("UPDATE USUARIOS SET USUA_TOKEN=:token");
+                $this->db->bind(':token',$token);
+                return $this->db->execute();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function getToken($id){
+            try {
+                $this->db->query("SELECT USUA_TOKEN FROM USUARIOS WHERE USUA_ID=:id");
+                $this->db->bind(':id',$id);
+                return $this->db->getRegisty();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
     }

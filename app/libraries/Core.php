@@ -5,6 +5,11 @@
         protected $parameters = [];
 
         public function __construct(){
+            header('Access-Control-Allow-Origin:*');
+            header('Access-Control-Allow-Headers:Authorization');
+            header('Access-Control-Allow-Methods:GET,POST');
+            header('Content-Type: application/json');
+            session_start();
             $url = $this->getUrl();
             if(isset($url[0])){
                 if(file_exists('../app/controllers/'.ucwords($url[0]).'.php')){
@@ -12,7 +17,6 @@
                     unset($url[0]);
                 }
             }
-
             require_once '../app/controllers/'.$this->currentController.'.php';
             $this->currentController = new $this->currentController;
 
@@ -41,12 +45,12 @@
         public function validateToken(){
             try {
                 $token = getBearerToken();
-                if(isset($_SESSION['token'])){
-                    if($token === $_SESSION['token']){
-                        $payload = JWT::decode($token,SECRETE_KEY,['HS256']);
-                        $_SESSION['payload'] = $payload;
-                    }
-                    else{
+                $payload = JWT::decode($token,SECRETE_KEY,['HS256']);
+                $id = $payload->userId;
+                $user = new User;
+                $tokenDB = $user->getToken($id);
+                if(!is_null($tokenDB->USUA_TOKEN)){
+                    if($token !== $tokenDB->USUA_TOKEN){
                         returnResponse(INVALID_ACCESS_TOKEN,'Token inválido. Por favor inicie sesión.');
                     }
                 }
