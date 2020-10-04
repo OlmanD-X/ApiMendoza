@@ -135,6 +135,9 @@
             case 'Alfa':
                 $regex = '/^[a-zA-Z]+(\.?\s?[a-zA-Z]*)*/';
                 break;
+            case 'Letras':
+                $regex = '/^[a-zA-Z]+/';
+                break;
             default:
                 # code...
                 break;
