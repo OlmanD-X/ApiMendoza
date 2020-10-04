@@ -5,6 +5,8 @@
         protected $parameters = [];
 
         public function __construct(){
+            header('Access-Control-Allow-Origin:*');
+            header('Content-Type: application/json');
             $url = $this->getUrl();
             if(isset($url[0])){
                 if(file_exists('../app/controllers/'.ucwords($url[0]).'.php')){

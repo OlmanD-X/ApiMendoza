@@ -5,8 +5,8 @@
         }
 
         public function login(){
-            header('Access-Control-Allow-Origin:*');
-            header('Content-Type: application/json');
+            // header('Access-Control-Allow-Origin:*');
+            // header('Content-Type: application/json');
 
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
@@ -37,6 +37,7 @@
                     );
 
                     $token = JWT::encode($payload,SECRETE_KEY);
+                    $_SESSION['token']=$token;
                     
                     $data = array('token' => $token,'user'=>$user->USUA_NOMBRE,'type'=>$user->USUA_TIPO_ID,'company'=>$user->EMP_RS,'logo'=>$user->EMP_LOGO);
                     
@@ -50,7 +51,9 @@
             }     
         }
 
-        public function add($id,$nombre){
-            echo $id,$nombre;
+        public function add(){
+            if($_SERVER['REQUEST_METHOD']!=='POST')
+                throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
+            echo 'HOLA';
         }
     }
