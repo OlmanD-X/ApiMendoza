@@ -5,9 +5,6 @@
         }
 
         public function login(){
-            header('Access-Control-Allow-Origin:*');
-            header('Content-Type: application/json');
-
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
 
@@ -37,10 +34,14 @@
                     );
 
                     $token = JWT::encode($payload,SECRETE_KEY);
-                    
-                    $data = array('token' => $token,'user'=>$user->USUA_NOMBRE,'type'=>$user->USUA_TIPO_ID,'company'=>$user->EMP_RS,'logo'=>$user->EMP_LOGO);
-                    
-                    returnResponse(SUCCESS_RESPONSE,'Login exitoso',$data);
+                    $_SESSION['token'] = $token;
+                    if($this->modelUser->setToken($token)){
+                        $data = array('token' => $token,'user'=>$user->USUA_NOMBRE,'type'=>$user->USUA_TIPO_ID,'company'=>$user->EMP_RS,'logo'=>$user->EMP_LOGO);
+                        returnResponse(SUCCESS_RESPONSE,'Login exitoso',$data);
+                    }
+                    else{
+                        throwError(LOGIN_FAILED,'No se pudo crear el token de acceso');
+                    }
                 }
                 else{
                     returnResponse(INVALID_USER_PASS,'Contraseña incorrecta',[]);
@@ -50,7 +51,10 @@
             }     
         }
 
-        public function add($id,$nombre){
-            echo $id,$nombre;
+        public function add(){
+            if($_SERVER['REQUEST_METHOD']!=='POST')
+                throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
+
+            echo json_encode('Hola'); 
         }
     }
