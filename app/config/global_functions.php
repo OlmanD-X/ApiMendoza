@@ -180,3 +180,14 @@
         }
         return $value;
     }
+
+    function calcularResultado($variables){
+
+        $respuesta = 1.0;
+        for ($i=0; $i < count($variables); $i++) { 
+            $respuesta = $respuesta*$variables[$i];
+        }
+
+        return $respuesta/100;
+
+    }
