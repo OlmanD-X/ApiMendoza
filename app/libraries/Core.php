@@ -6,14 +6,10 @@
 
         public function __construct(){
             header('Access-Control-Allow-Origin:*');
-<<<<<<< HEAD
-            header('Content-Type: application/json');
-=======
             header('Access-Control-Allow-Headers:Authorization');
             header('Access-Control-Allow-Methods:GET,POST');
             header('Content-Type: application/json');
             session_start();
->>>>>>> 3ac2d786c1bdb756505a19f3313a0575cc87e79a
             $url = $this->getUrl();
             if(isset($url[0])){
                 if(file_exists('../app/controllers/'.ucwords($url[0]).'.php')){
@@ -48,6 +44,7 @@
 
         public function validateToken(){
             try {
+                require_once '../app/models/User.php';
                 $token = getBearerToken();
                 $payload = JWT::decode($token,SECRETE_KEY,['HS256']);
                 $id = $payload->userId;

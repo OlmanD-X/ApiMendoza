@@ -1,17 +1,15 @@
 <?php
     class Indicators extends Controller{
         public function __construct(){
-            $this->modelUser = $this->model('User');
+           // $this->modelUser = $this->model('User');
         }
 
         public function add(){
-            header('Access-Control-Allow-Origin:*');
-            header('Content-Type: application/json');
 
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
+            echo 'hola';
 
-            $name = validateParameter('Indicador',$_POST['name'],STRING);
             
         }
     }
