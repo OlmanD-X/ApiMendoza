@@ -1,75 +1,193 @@
 <?php
-    class Empresas extends Controller{
-        public function __construct(){
-            $this->modelEmpresa = $this->model('Empresa');
-        }
+  class Empresas extends Controller{
 
-        public function add(){
-            if($_SERVER['REQUEST_METHOD']!=='POST')
-                throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
-            
-            $emp_rs = validateAlfanumeric('Razon social',validateParameter('Razon social', trim($_POST['EMP_RS']),STRING),'Alfanumeric');
-            $emp_ruc = validateRuc(trim($_POST['EMP_RUC']));
-            $emp_logo = $_POST['EMP_LOGO'] ?? NULL;
-            //FALTA VALIDAR IMAGEN
-            $existe_ruc = $this->modelEmpresa->validateRuc($emp_ruc);
-            $existe_rs = $this->modelEmpresa->validateRS($emp_rs);
-
-            if($existe_rs) throwError(DESC_IS_INVALID,'La empresa '.$emp_rs.' ya ha sido registrada'); 
-            if($existe_ruc) throwError(DESC_IS_INVALID,'Existe un registro con el ruc '.$emp_ruc);
-
-            $insert = $this->modelEmpresa->add($emp_rs,$emp_ruc,$emp_logo);
-            if($insert){
-                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'La empresa '.$emp_rs.' fue registrada con éxito');
-            }else{
-                throwError(INSERTED_DATA_NOT_COMPLETE,'Se produjo un error al insertar los datos');
-            }
-        }
-
-        public function getAllEmpresas(){
-            $data = $this->modelEmpresa->getAllEmpresas();
-            if(empty($data)){
-                throwError(GET_DATA_NOT_COMPLETE,'No existen registros');
-            }
-            else{
-                returnResponse(GET_REGISTIES_SUCCESSFULLY,'Se obtuvieron los registros exitosamente',$data);
-            }
-        }
-
-        public function getEmpresa($EMP_ID){
-            $data = $this->modelEmpresa->getEmpresa($EMP_ID);
-            if(empty($data)){
-                throwError(GET_DATA_NOT_COMPLETE,'No existen registros');
-            }
-            else{
-                returnResponse(GET_REGISTIES_SUCCESSFULLY,'Se obtuvieron los registros exitosamente',$data);
-            }
-        }
-
-        public function update(){
-            if($_SERVER['REQUEST_METHOD']!=='POST')
-                throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
-
-            $emp_id = $_POST['EMP_ID'];
-            $emp_rs = validateAlfanumeric('Razon social',validateParameter('Razon social', trim($_POST['EMP_RS']),STRING),'Alfanumeric');
-            $emp_ruc = validateRuc(trim($_POST['EMP_RUC']));
-            $emp_logo = $_POST['EMP_LOGO'] ?? NULL;
-            //VALIDAR LOGO
-
-            $update = $this->modelEmpresa->update($emp_id,$emp_rs,$emp_ruc,$emp_logo);
-            if($update){
-                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Datos actualizados exitosamente');
-            }else{
-                throwError(INSERTED_DATA_NOT_COMPLETE,'Se produjo un error al actualizar los datos');
-            }
-        }
-
-        public function delete($EMP_ID){
-            $delete = $this->modelEmpresa->delete($EMP_ID);
-            if($delete){
-                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Registro eliminado con éxito');
-            }else{
-                throwError(INSERTED_DATA_NOT_COMPLETE,'Se produjo un error al eliminar registro');
-            }
-        }
+    public function __construct(){
+      $this->modelEmpresa = $this->model('Empresa');
     }
+
+    public function ctrMostrarEmpresas($item=null, $valor=null){
+      $tabla = "empresas";
+      $respuesta = $this->modelEmpresa->mdlMostrarEmpresas($tabla, $item, $valor);
+      //print_r($respuesta);
+      echo json_encode($respuesta);
+    }
+
+    public function ctrCrearEmpresa(){
+
+      if( isset($_POST["new_empRS"]) ){
+
+        $Empresa = validateAlfaNumeric('Razon Social', $_POST["new_empRS"], 'Alfanumeric');
+        $RUC = validateRuc($_POST["new_empRUC"]);
+
+        //Hacemos la consulta para verificar que no haya datos repetidos.
+        $verificacion = $this->modelEmpresa->mdlVerificar_Empresa($Empresa, $RUC, null);
+
+        if( $verificacion == "No hay datos" ){
+
+          // Validar Imagen
+          $ruta = "img/productos/default/anonymous.png";
+          if(isset($_FILES["new_empLogo"]["tmp_name"])){
+            list($ancho, $alto) = getimagesize($_FILES["new_empLogo"]["tmp_name"]);
+            $nuevoAncho = 500;
+            $nuevoAlto = 500;
+
+            // CREAMOS EL DIRECTORIO DONDE VAMOS A GUARDAR LA FOTO DEL USUARIO
+            $directorio = "img/empresa/".$_POST["new_empRUC"];
+            mkdir($directorio, 0755);
+
+            // DE ACUERDO AL TIPO DE IMAGEN APLICAMOS LAS FUNCIONES POR DEFECTO DE PHP/
+            if($_FILES["new_empLogo"]["type"] == "image/jpeg"){
+              // GUARDAMOS LA IMAGEN EN EL DIRECTORIO
+              $aleatorio = mt_rand(100,999);
+              $ruta = "img/empresa/".$_POST["new_empRUC"]."/".$aleatorio.".jpg";
+              $origen = imagecreatefromjpeg($_FILES["new_empLogo"]["tmp_name"]);						
+              $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+              imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
+              imagejpeg($destino, $ruta);
+            }
+
+            if($_FILES["new_empLogo"]["type"] == "image/png"){
+              // GUARDAMOS LA IMAGEN EN EL DIRECTORIO
+              $aleatorio = mt_rand(100,999);
+              $ruta = "img/empresa/".$_POST["new_empRUC"]."/".$aleatorio.".png";
+              $origen = imagecreatefrompng($_FILES["new_empLogo"]["tmp_name"]);						
+              $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+              imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
+              imagepng($destino, $ruta);
+            }
+
+          }
+
+          $tabla = "empresas";
+          $datos = array("EMP_RS" => $_POST["new_empRS"],
+                  "EMP_RUC" => $_POST["new_empRUC"],
+                  "EMP_LOGO" => $ruta,
+                  "EMP_ESTADO" => '1');
+
+          $respuesta = $this->modelEmpresa->mdlRegistrarEmpresa($tabla, $datos);
+
+          if($respuesta == "ok"){
+            returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Empresa creada correctamente");
+          }else{
+            throwError(INSERTED_DATA_NOT_COMPLETE, "Error al registrar la empresa.");
+          }
+
+        }else{
+          throwError(INSERTED_DATA_NOT_COMPLETE, "La 'Razón Social' y/o 'RUC' ya se encuentran registrados.");
+        }
+      }else{
+        throwError(INSERTED_DATA_NOT_COMPLETE, "Campos de entrada, no definidos.");
+      }
+    }
+
+    public function ctrEditarEmpresa(){
+
+      if( isset($_POST["edit_empRS"]) ){
+  
+        $Empresa = validateAlfaNumeric('Razon Social', $_POST["edit_empRS"], 'Alfanumeric');
+        $RUC = validateRuc($_POST["edit_empRUC"]);
+        $id = $_POST["Id_Empresa"];
+
+        //Hacemos la consulta para verificar que no haya datos repetidos.
+        $verificacion = $this->modelEmpresa->mdlVerificar_Empresa($Empresa, $RUC, $id);
+
+        if( $verificacion == "Actualizar" ){
+ 
+          // Validar Imagen
+          $ruta = $_POST["logoActual"];  
+          if(isset($_FILES["edit_empLogo"]["tmp_name"]) && !empty($_FILES["edit_empLogo"]["tmp_name"])){
+            list($ancho, $alto) = getimagesize($_FILES["edit_empLogo"]["tmp_name"]);
+            $nuevoAncho = 500;
+            $nuevoAlto = 500;
+
+            // CREAMOS EL DIRECTORIO DONDE VAMOS A GUARDAR LA FOTO DEL USUARIO
+            $directorio = "img/empresa/".$_POST["edit_empRUC"];
+
+            // PRIMERO PREGUNTAMOS SI EXISTE OTRA IMAGEN EN LA BD
+            if(!empty($_POST["logoActual"]) && $_POST["logoActual"] != "img/productos/default/anonymous.png"){
+              unlink($_POST["logoActual"]);
+            }else{
+              mkdir($directorio, 0755);	
+            }
+
+            // DE ACUERDO AL TIPO DE IMAGEN APLICAMOS LAS FUNCIONES POR DEFECTO DE PHP
+
+            if($_FILES["edit_empLogo"]["type"] == "image/jpeg"){
+              // GUARDAMOS LA IMAGEN EN EL DIRECTORIO
+              $aleatorio = mt_rand(100,999);
+              $ruta = "img/productos/".$_POST["edit_empRUC"]."/".$aleatorio.".jpg";
+              $origen = imagecreatefromjpeg($_FILES["edit_empLogo"]["tmp_name"]);						
+              $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+              imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
+              imagejpeg($destino, $ruta);
+            }
+
+            if($_FILES["edit_empLogo"]["type"] == "image/png"){
+              // GUARDAMOS LA IMAGEN EN EL DIRECTORIO
+              $aleatorio = mt_rand(100,999);
+              $ruta = "img/productos/".$_POST["edit_empRUC"]."/".$aleatorio.".png";
+              $origen = imagecreatefrompng($_FILES["edit_empLogo"]["tmp_name"]);						
+              $destino = imagecreatetruecolor($nuevoAncho, $nuevoAlto);
+              imagecopyresized($destino, $origen, 0, 0, 0, 0, $nuevoAncho, $nuevoAlto, $ancho, $alto);
+              imagepng($destino, $ruta);
+            }
+              
+          }
+          
+          $tabla = "empresas";
+          $datos = array("EMP_RS" => $_POST["edit_empRS"],
+                          "EMP_RUC" => $_POST["edit_empRUC"],
+                          "EMP_LOGO" => $ruta,
+                          "EMP_ESTADO" => '1');
+
+          $respuesta = $this->modelEmpresa->mdlEditarEmpresa($tabla, $datos, $id);
+
+          if($respuesta == "ok"){
+            returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Empresa actualizada correctamente");
+          }else{
+            throwError(INSERTED_DATA_NOT_COMPLETE, "Error al actualizar la empresa.");
+          }
+
+        }else{
+          throwError(INSERTED_DATA_NOT_COMPLETE, "No se puede actualizar, porque la 'Razón Social' y/o 'RUC' ya se encuentran registrados.");
+        }
+      }else{
+        throwError(INSERTED_DATA_NOT_COMPLETE, "Campos de entrada, no definidos.");
+      }
+    }
+
+    public function ctrEliminarEmpresa($id){
+
+      $tabla ="empresas";
+      
+      if ( is_numeric($id) ){
+
+        /*
+        //Obtenemos los datos con el ID para eliminar la foto
+        $respuesta = $this->modelEmpresa->mdlTraerDatos_Empresa($tabla, $id);
+        $array = json_decode(json_encode($respuesta), true);
+        print_r($respuesta);
+        print_r($array);
+        print_r("\n ---".$array["EMP_LOGO"]);
+
+        if( $array["EMP_LOGO"]!="" && $array["EMP_LOGO"]!="img/empresa/default/anonymous.png"){
+          unlink( $array["EMP_LOGO"] );
+          rmdir('img/empresa/'.$array["EMP_RUC"]);
+        }
+        */
+
+        $resp = $this->modelEmpresa->mdlEliminarEmpresa($tabla, $id);
+
+        if($resp == "ok"){
+          returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Empresa eliminada correctamente");
+        }else{
+          throwError(INSERTED_DATA_NOT_COMPLETE, "Error al eliminar la empresa.");
+        }
+
+      }else{
+        throwError(CONTENT_TYPE_NOT_VALID, "El Id que busca, no es válido.");
+      }
+
+    }
+
+  }
