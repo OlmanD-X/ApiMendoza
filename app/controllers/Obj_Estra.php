@@ -9,8 +9,8 @@
     public function ctrMostrar_objEstrategicos($item=null, $valor=null){
       $tabla = "objetivos_estrategicos";
       $respuesta = $this->modelObjEstra->mdlMostrar_objEstrategicos($tabla, $item, $valor);
-      print_r($respuesta);
-      return $respuesta;
+      //print_r($respuesta);
+      echo json_encode($respuesta);
     }
 
     public function ctrCrear_objEstrategico(){

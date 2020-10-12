@@ -10,7 +10,7 @@
       $tabla = "empresas";
       $respuesta = $this->modelEmpresa->mdlMostrarEmpresas($tabla, $item, $valor);
       //print_r($respuesta);
-      return $respuesta;
+      echo json_encode($respuesta);
     }
 
     public function ctrCrearEmpresa(){

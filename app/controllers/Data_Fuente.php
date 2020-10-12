@@ -56,24 +56,21 @@
                 
         $DF_PERIODO = validateAlfaNumeric('Periodo.', $_POST["new_dfPeriodo"], 'Alfanumeric');
 
-        $tabla = "resumen_data_fuente";
         $Id_Indicador = $_POST["Id_Indicador"];
         $datos = array("DF_PERIODO" => $DF_PERIODO,
                 "DF_RESULT" => 0.00,
                 "DF_IND_ID" => $Id_Indicador,
                 "DF_RUTA_ARCHIVO" => "");
 
-        $respuesta = $this->modelDataFuente->mdlRegistrar_DataFuente($tabla, $datos);
+        $respuesta = $this->modelDataFuente->mdlRegistrar_DataFuente("resumen_data_fuente", $datos);
 
         if($respuesta !=-1 ){
  
-          $tabla = "variable_data_fuente";
-          $resp = $this->modelDataFuente->mdlRegistrar_variablesDF($tabla, $variables, $respuesta);
+          $resp = $this->modelDataFuente->mdlRegistrar_variablesDF("variable_data_fuente", $variables, $respuesta);
 
           if ( $resp=="ok" ){
 
-            $tabla = "resumen_data_fuente";
-            $resultadoFinal = $this->modelDataFuente->mdlActualizar_resultadoDF($tabla, $variables, $respuesta);
+            $resultadoFinal = $this->modelDataFuente->mdlActualizar_resultadoDF("resumen_data_fuente", $variables, $respuesta);
 
             if ( $resultadoFinal=="ok" ){
               returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Data Fuente, y variables creados correctamente.");
@@ -94,48 +91,64 @@
       }
     }
 
-    public function ctrEditar_objEstrategico(){
+    public function ctrEditar_DataFuente(){
 
-      if( isset($_POST["edit_oeDesc"]) ){
-  
-        $OE_Desc = validateAlfaNumeric('Descripción Objetivo Estratégico.', $_POST["edit_oeDesc"], 'Alfanumeric');
-        $id = $_POST["Id_ObjEstra"];
-        $id_empresa = $_POST["edit_oeEmpId"];
-        //Hacemos la consulta para verificar que no haya datos repetidos.
-        $verificacion = $this->modelObjEstra->mdlVerificar_objEstrategicos($OE_Desc, $id);
-        
-        if( $verificacion == "Actualizar" ){
-           
-          $tabla = "objetivos_estrategicos";
-          $descripcion = $_POST["edit_oeDesc"];
-          $respuesta = $this->modelObjEstra->mdlEditar_objEstrategico($tabla, $descripcion, $id_empresa, $id);
+      $variables = $_POST["edit_variables"];
 
-          if($respuesta == "ok"){
-            returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Objetivo Estratégico actualizado correctamente.");
-          }else{
-            throwError(INSERTED_DATA_NOT_COMPLETE, "Error al actualizar el Objetivo Estratégico.");
-          }
-
+      $verificarVariables = true;
+      for ($i=0; $i < count($variables); $i++) { 
+        if ( !(preg_match('/^\d{1,8}(\.\d{1,3})?$/', $variables[$i])) && $verificarVariables){
+          $verificarVariables = false;
         }else{
-          throwError(INSERTED_DATA_NOT_COMPLETE, "No se puede actualizar, porque el Objetivo Estratégico ya se encuentra registrado.");
+          print_r($variables[$i]);
         }
+      }
+
+      if( isset($_POST["edit_dfPeriodo"]) && $verificarVariables ){
+                
+        $DF_PERIODO = validateAlfaNumeric('Periodo.', $_POST["edit_dfPeriodo"], 'Alfanumeric');
+        $Id_DF = $_POST["edit_DF_ID"];
+        $respuesta = $this->modelDataFuente->mdlEditar_DataFuente("resumen_data_fuente", $DF_PERIODO, $Id_DF);
+
+        if($respuesta=="ok" ){
+ 
+          $temporal = $this->modelDataFuente->mdlObtener_IdsVariables("variable_data_fuente", "VAR_DF_ID", $Id_DF);
+          $Ids_variables = json_decode(json_encode($temporal), true);
+          $resp = $this->modelDataFuente->mdlEditar_variablesDF("variable_data_fuente", $variables, $Ids_variables, $Id_DF);
+
+          if ( $resp=="ok" ){
+
+            $resultadoFinal = $this->modelDataFuente->mdlActualizar_resultadoDF("resumen_data_fuente", $variables, $Id_DF);
+
+            if ( $resultadoFinal=="ok" ){
+              returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Data Fuente, y variables actualizados correctamente.");
+            }else{
+              throwError(INSERTED_DATA_NOT_COMPLETE, "Error al actualizar el resultado de las variables de la DATA FUENTE.");
+            }
+            
+          }else{
+            throwError(INSERTED_DATA_NOT_COMPLETE, "Error al actualizar las variables de la DATA FUENTE.");
+          }
+          
+        }else{
+          throwError(INSERTED_DATA_NOT_COMPLETE, "Error al actualizar los datos de la DATA FUENTE.");
+        }
+
       }else{
-        throwError(INSERTED_DATA_NOT_COMPLETE, "Campos de entrada, no definidos.");
+        throwError(INSERTED_DATA_NOT_COMPLETE, "Datos que intenta actualizar no son válidos. Verifique que el valor de las variables no contenga COMAS(,).");
       }
     }
 
-    public function ctrEliminar_objEstrategico($id){
-
-      $tabla ="objetivos_estrategicos";
-      
+    public function ctrEliminar_DataFuente($id){
+     
       if ( is_numeric($id) ){
 
-        $resp = $this->modelObjEstra->mdlEliminar_objEstrategico($tabla, $id);
+        $resp = $this->modelDataFuente->mdlEliminar_DataFuente("resumen_data_fuente", $id);
 
         if($resp == "ok"){
-          returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Objetivo Estratégico eliminado correctamente.");
+          returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Data Fuente eliminada correctamente.");
         }else{
-          throwError(INSERTED_DATA_NOT_COMPLETE, "Error al eliminar el Objetivo Estratégico.");
+          throwError(INSERTED_DATA_NOT_COMPLETE, "Error al eliminar la data fuente seleccionada.");
         }
 
       }else{
