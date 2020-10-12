@@ -1,7 +1,7 @@
 <?php
     class Indicators extends Controller{
         public function __construct(){
-            $this->modelUser = $this->model('User');
+           // $this->modelUser = $this->model('User');
         }
 
         public function add($id,$proc){
