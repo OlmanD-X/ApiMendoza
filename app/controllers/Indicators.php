@@ -1,10 +1,10 @@
 <?php
     class Indicators extends Controller{
         public function __construct(){
-           // $this->modelUser = $this->model('User');
+           $this->modelIndicator = $this->model('Indicator');
         }
 
-        public function add($id,$proc){
+        public function add($proc,$id){
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
 
@@ -21,6 +21,22 @@
             $redValue = validateParameter('Semáforo en rojo',$_POST['redValue'],NUMERIC);
             $yellowValue = validateParameter('Semáforo en rojo',$_POST['yellowValue'],NUMERIC);
             $greenValue = validateParameter('Semáforo en rojo',$_POST['greenValue'],NUMERIC);
+            $variables = json_decode($_POST['variables']);
+            $initiatives = json_decode($_POST['iniciativas']);
+
+            //* Comprobar si el indicador ya ha sido registrado
+
+            $response = '';
+            if($proc=='proceso'){
+                $response = $this->modelIndicator->add($name,$responsable,$objetivo,$lineaBase,$meta,$frecuencia,$formula,$redSymbol,$yellowSymbol,$greenSymbol,$redValue,$yellowValue,$greenValue,$id,NULL,$variables,$initiatives);
+            }
+            else{
+                $response = $this->modelIndicator->add($name,$responsable,$objetivo,$lineaBase,$meta,$frecuencia,$formula,$redSymbol,$yellowSymbol,$greenSymbol,$redValue,$yellowValue,$greenValue,NULL,$id,$variables,$initiatives);
+            }
+            if($response)
+                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Indicador creado correctamente');
+            else    
+                returnResponse(INSERTED_DATA_NOT_COMPLETE,'No se pudo crear el indicador');
             
         }
     }
