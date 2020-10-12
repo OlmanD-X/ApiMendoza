@@ -4,7 +4,7 @@
             $this->modelUser = $this->model('User');
         }
 
-        public function add(){
+        public function add($id,$proc){
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
 
@@ -15,6 +15,12 @@
             $meta = validateAlfaNumeric('Meta',validateParameter('Meta',$_POST['meta'],STRING),'Alfanumeric');
             $frecuencia = validateAlfaNumeric('Frecuencia',validateParameter('Frecuencia',$_POST['frecuencia'],STRING),'Alfa');
             $formula = validateFormula(validateParameter('Formula',$_POST['formula'],STRING));
-            // $redSymbol = 
+            $redSymbol = $_POST['redSymbol'];
+            $yellowSymbol = $_POST['yellowSymbol'];
+            $greenSymbol = $_POST['greenSymbol'];
+            $redValue = validateParameter('Semáforo en rojo',$_POST['redValue'],NUMERIC);
+            $yellowValue = validateParameter('Semáforo en rojo',$_POST['yellowValue'],NUMERIC);
+            $greenValue = validateParameter('Semáforo en rojo',$_POST['greenValue'],NUMERIC);
+            
         }
     }

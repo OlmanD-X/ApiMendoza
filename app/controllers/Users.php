@@ -34,8 +34,7 @@
                     );
 
                     $token = JWT::encode($payload,SECRETE_KEY);
-                    $_SESSION['token'] = $token;
-                    if($this->modelUser->setToken($token)){
+                    if($this->modelUser->setToken($token,$user->USUA_ID)){
                         $data = array('token' => $token,'user'=>$user->USUA_NOMBRE,'type'=>$user->USUA_TIPO_ID,'company'=>$user->EMP_RS,'logo'=>$user->EMP_LOGO);
                         returnResponse(SUCCESS_RESPONSE,'Login exitoso',$data);
                     }
@@ -49,12 +48,5 @@
             } catch (\Throwable $th) {
                 throwError(LOGIN_FAILED,'Se produjo un error al momento de iniciar sesión',$th->getMessage());
             }     
-        }
-
-        public function add(){
-            if($_SERVER['REQUEST_METHOD']!=='POST')
-                throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
-
-            echo json_encode('Hola'); 
         }
     }

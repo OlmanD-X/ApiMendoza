@@ -20,10 +20,11 @@
             
         }
 
-        public function setToken($token){
+        public function setToken($token,$id){
             try {
-                $this->db->query("UPDATE USUARIOS SET USUA_TOKEN=:token");
+                $this->db->query("UPDATE USUARIOS SET USUA_TOKEN=:token WHERE USUA_ID=:id");
                 $this->db->bind(':token',$token);
+                $this->db->bind(':id',$id);
                 return $this->db->execute();
             } catch (\Throwable $th) {
                 return $th->getMessage();
