@@ -24,7 +24,7 @@
                     $payload = array(
                         'iat'=>time(),
                         'iss' => 'localhost',
-                        'exp' => time() + (60*60),
+                        'exp' => time() + (24*60*60),
                         'userId' => $user->USUA_ID,
                         'name' => $user->USUA_NOMBRE,
                         'type' => $user->USUA_TIPO_ID,
