@@ -50,10 +50,22 @@
 
         public function addVariable($symbol,$desc,$id){
             try {
-                $this->db->query("INSERT INTO VARIABLE(VAR_SYMBOL,VAR_DESC,VAR_IND_ID) VALUES(:symbol,:descIni,:indId)");
+                $this->db->query("INSERT INTO VARIABLE(VAR_SYMBOL,VAR_DESC,VAR_IND_ID) VALUES(:symbol,:descVar,:indId)");
                 $this->db->bind(':symbol',$symbol);
-                $this->db->bind(':descIni',$desc);
+                $this->db->bind(':descVar',$desc);
                 $this->db->bind(':indId',$id);
+                return $this->db->execute();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function updateVariable($symbol,$desc,$id){
+            try {
+                $this->db->query("UPDATE VARIABLE SET VAR_SYMBOL=:symbol,VAR_DESC=:descVar WHERE VAR_ID=:id");
+                $this->db->bind(':symbol',$symbol);
+                $this->db->bind(':descVar',$desc);
+                $this->db->bind(':id',$id);
                 return $this->db->execute();
             } catch (\Throwable $th) {
                 return $th->getMessage();
@@ -65,6 +77,17 @@
                 $this->db->query("INSERT INTO INICIATIVAS(INI_DESC,INI_IND_ID) VALUES(:descIni,:indId)");
                 $this->db->bind(':descIni',$desc);
                 $this->db->bind(':indId',$id);
+                return $this->db->execute();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function updateInitiative($desc,$id){
+            try {
+                $this->db->query("UPDATE INICIATIVAS SET INI_DESC=:descIni WHERE INI_ID=:id");
+                $this->db->bind(':descIni',$desc);
+                $this->db->bind(':id',$id);
                 return $this->db->execute();
             } catch (\Throwable $th) {
                 return $th->getMessage();
@@ -181,12 +204,66 @@
             }
         }
 
+        public function getAllByProceso($id)
+        {
+            try {
+                $this->db->query("SELECT * FROM INDICADORES WHERE IND_PROC_ID=:id");
+                $this->db->bind(':id',$id);
+                return $this->db->getRegisties();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function getAllBySubroceso($id)
+        {
+            try {
+                $this->db->query("SELECT * FROM INDICADORES WHERE IND_SUB_ID=:id");
+                $this->db->bind(':id',$id);
+                return $this->db->getRegisties();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
         public function get($id)
         {
             try {
                 $this->db->query("SELECT * FROM INDICADORES WHERE IND_ID=:id");
                 $this->db->bind(':id',$id);
                 return $this->db->getRegisty();
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function getByName($nombre,$id)
+        {
+            try {
+                $this->db->query("SELECT * FROM INDICADORES WHERE IND_NAME=:nombre AND IND_PROC_ID=:id");
+                $this->db->bind(':nombre',$nombre);
+                $this->db->bind(':id',$id);
+                $bool = $this->db->getRegisty();
+                if(is_object($bool))
+                    return true;
+                else
+                    return false;
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function getByName2($nombre,$id)
+        {
+            try {
+                $this->db->query("SELECT * FROM INDICADORES WHERE IND_NAME=:nombre AND IND_SUB_ID=:id");
+                $this->db->bind(':nombre',$nombre);
+                $this->db->bind(':id',$id);
+                $bool = $this->db->getRegisty();
+                if(is_object($bool))
+                    return true;
+                else
+                    return false;
             } catch (\Throwable $th) {
                 return $th->getMessage();
             }
@@ -203,10 +280,10 @@
             }
         }
 
-        public function update($name,$responsable,$obj,$lineBase,$meta,$frecuency,$formula,$redSymbol,$yellowSymbol,$greenSymbol,$redValue,$yellowValue,$greenValue,$procId,$subProcId,$variables,$initiatives,$id)
+        public function update($name,$responsable,$obj,$lineBase,$meta,$frecuency,$formula,$redSymbol,$yellowSymbol,$greenSymbol,$redValue,$yellowValue,$greenValue,$variables,$initiatives,$id)
         {
             try {
-                $this->db->query("UPDATE INDICADORES SET IND_NAME=:nombre,IND_RESPONSABLE=:responsable,IND_OBJ=:obj,IND_LINEA_BASE=:linebase,IND_META=:meta,IND_FRECUENCIA=:frecuency,IND_FORMULA=:formula,IND_RED_SYMBOL=:redSymbol,IND_RED_VALUE=:redValue,IND_YELLOW_SYMBOL=:yellowSymbol,IND_YELLOW_VALUE=:yellowValue,IND_GREEN_SYMBOL=:greenSymbol,IND_GREEN_VALUE=:greenValue,IND_PROC_ID=:procId,IND_SUB_ID=:subId WHERE IND_ID=:id");
+                $this->db->query("UPDATE INDICADORES SET IND_NAME=:nombre,IND_RESPONSABLE=:responsable,IND_OBJ=:obj,IND_LINEA_BASE=:linebase,IND_META=:meta,IND_FRECUENCIA=:frecuency,IND_FORMULA=:formula,IND_RED_SYMBOL=:redSymbol,IND_RED_VALUE=:redValue,IND_YELLOW_SYMBOL=:yellowSymbol,IND_YELLOW_VALUE=:yellowValue,IND_GREEN_SYMBOL=:greenSymbol,IND_GREEN_VALUE=:greenValue WHERE IND_ID=:id");
                 $this->db->bind(':nombre',$name);
                 $this->db->bind(':responsable',$responsable);
                 $this->db->bind(':obj',$obj);
@@ -220,8 +297,6 @@
                 $this->db->bind(':yellowValue',$yellowValue);
                 $this->db->bind(':greenSymbol',$greenSymbol);
                 $this->db->bind(':greenValue',$greenValue);
-                $this->db->bind(':procId',$procId);
-                $this->db->bind(':subId',$subProcId);
                 $this->db->bind(':id',$id);
                 $bool= $this->db->execute();
                 if(!$bool)
