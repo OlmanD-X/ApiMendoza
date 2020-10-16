@@ -25,9 +25,10 @@
             }
         }
 
-        public function getAll(){
+        public function getAll($id){
             try {
-                $this->db->query("SELECT PERS_ID,PERS_NAME,PERS_ORDEN,PERS_ME_ID FROM PERSPECTIVA");
+                $this->db->query("SELECT PERS_ID,PERS_NAME,PERS_ORDEN,PERS_ME_ID FROM PERSPECTIVA WHERE PERS_ME_ID=:id");
+                $this->db->bind(':id',$id);
                 return $this->db->getRegisties();
             } catch (\Throwable $th) {
                 return $th->getMessage();
@@ -89,6 +90,40 @@
             try{
                 $this->db->query("SELECT *FROM PERSPECTIVA P INNER JOIN DET_MAPA_ESTRATEGICO DME ON P.PERS_ID=DME.DET_PERS_ID WHERE DME.DET_PERS_ID=:PERS_ID");
                 $this->db->bind(':PERS_ID',$PERS_ID);
+                $data = $this->db->getRegisty();
+                    if(!empty($data->PERS_ID))
+                        return true;
+                    else
+                        return false; 
+
+            }catch(\Throwable $th){
+                return $th->getMessage();
+            }
+        }
+
+        public function validateName($name,$id)
+        {
+            try{
+                $this->db->query("SELECT *FROM PERSPECTIVA WHERE PERS_NAME=:nombre AND PERS_ME_ID=:id");
+                $this->db->bind(':nombre',$name);
+                $this->db->bind(':id',$id);
+                $data = $this->db->getRegisty();
+                    if(!empty($data->PERS_ID))
+                        return true;
+                    else
+                        return false; 
+
+            }catch(\Throwable $th){
+                return $th->getMessage();
+            }
+        }
+
+        public function validateLevel($level,$id)
+        {
+            try{
+                $this->db->query("SELECT *FROM PERSPECTIVA WHERE PERS_ORDEN=:nivel AND PERS_ME_ID=:id");
+                $this->db->bind(':nivel',$level);
+                $this->db->bind(':id',$id);
                 $data = $this->db->getRegisty();
                     if(!empty($data->PERS_ID))
                         return true;

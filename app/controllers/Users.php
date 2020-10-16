@@ -35,7 +35,7 @@
 
                     $token = JWT::encode($payload,SECRETE_KEY);
                     if($this->modelUser->setToken($token,$user->USUA_ID)){
-                        $data = array('token' => $token,'user'=>$user->USUA_NOMBRE,'type'=>$user->USUA_TIPO_ID,'company'=>$user->EMP_RS,'logo'=>$user->EMP_LOGO);
+                        $data = array('token' => $token,'user'=>$user->USUA_NOMBRE,'type'=>$user->USUA_TIPO_ID,'company'=>$user->EMP_RS,'logo'=>$user->EMP_LOGO,'companyId'=>$user->USUA_EMP_ID);
                         returnResponse(SUCCESS_RESPONSE,'Login exitoso',$data);
                     }
                     else{

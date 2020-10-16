@@ -11,7 +11,7 @@
             $name = validateAlfaNumeric('Indicador',validateParameter('Indicador',$_POST['name'],STRING),'Alfa');
             $responsable = validateAlfaNumeric('Responsable',validateParameter('Responsable',$_POST['responsable'],STRING),'Alfa');
             $objetivo = validateAlfaNumeric('Objetivo',validateParameter('Objetivo',$_POST['objetivo'],STRING),'Alfa');
-            $lineaBase = validateAlfaNumeric('Línea Base',validateParameter('Línea Base',$_POST['lineabase'],STRING),'Alfa');
+            $lineaBase = validateParameter('Línea Base',$_POST['lineabase'],NUMERIC);
             $meta = validateAlfaNumeric('Meta',validateParameter('Meta',$_POST['meta'],STRING),'Alfanumeric');
             $frecuencia = validateAlfaNumeric('Frecuencia',validateParameter('Frecuencia',$_POST['frecuencia'],STRING),'Alfa');
             $formula = validateFormula(validateParameter('Formula',$_POST['formula'],STRING));
@@ -26,7 +26,10 @@
             $variables = json_decode($_POST['variables']);
             $initiatives = json_decode($_POST['iniciativas']);
 
-            $bool = $this->modelIndicator->getByName($name);
+            if($proc=='proceso')
+                $bool = $this->modelIndicator->getByName($name,$id);
+            else
+                $bool = $this->modelIndicator->getByName2($name,$id);
             if($bool)
                 throwError(PARAMETER_IS_INVALID,'El indicador ya ha sido registrado');
             $response = '';
@@ -51,7 +54,7 @@
             $name = validateAlfaNumeric('Indicador',validateParameter('Indicador',$_POST['name'],STRING),'Alfa');
             $responsable = validateAlfaNumeric('Responsable',validateParameter('Responsable',$_POST['responsable'],STRING),'Alfa');
             $objetivo = validateAlfaNumeric('Objetivo',validateParameter('Objetivo',$_POST['objetivo'],STRING),'Alfa');
-            $lineaBase = validateAlfaNumeric('Línea Base',validateParameter('Línea Base',$_POST['lineabase'],STRING),'Alfa');
+            $lineaBase = validateParameter('Línea Base',(int)$_POST['lineabase'],NUMERIC);
             $meta = validateAlfaNumeric('Meta',validateParameter('Meta',$_POST['meta'],STRING),'Alfanumeric');
             $frecuencia = validateAlfaNumeric('Frecuencia',validateParameter('Frecuencia',$_POST['frecuencia'],STRING),'Alfa');
             $formula = validateFormula(validateParameter('Formula',$_POST['formula'],STRING));
@@ -64,15 +67,19 @@
             $id = $_POST['id'];
             $variables = json_decode($_POST['variables']);
             $initiatives = json_decode($_POST['iniciativas']);
-
-            $bool = $this->modelIndicator->getByName($name);
+            $proc = $_POST['tipoProceso'];
+            $idProc = $_POST['idProceso'];
+            if($proc=='proceso')
+                $bool = $this->modelIndicator->getByNameEdit($name,$idProc,$id);
+            else
+                $bool = $this->modelIndicator->getByName2Edit($name,$idProc,$id);
             if($bool)
                 throwError(PARAMETER_IS_INVALID,'El indicador ya ha sido registrado');
             $response = $this->modelIndicator->update($name,$responsable,$objetivo,$lineaBase,$meta,$frecuencia,$formula,$redSymbol,$yellowSymbol,$greenSymbol,$redValue,$yellowValue,$greenValue,$variables,$initiatives,$id);
             if($response)
-                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Indicador creado correctamente');
+                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Indicador actualizado correctamente');
             else    
-                returnResponse(INSERTED_DATA_NOT_COMPLETE,'No se pudo crear el indicador');
+                returnResponse(INSERTED_DATA_NOT_COMPLETE,'No se pudo actualizar el indicador');
         }
 
         public function delete($id)
@@ -90,25 +97,28 @@
             if($data)
                 returnResponse(GET_REGISTIES_SUCCESSFULLY,'Indicador obtenido correctamente',$data);
             else
-                returnResponse(GET_DATA_NOT_COMPLETE,'No se pudo eliminar el indicador');
+                returnResponse(GET_DATA_NOT_COMPLETE,'No se pudo obtener los registros');
         }
 
         public function getAll()
         {
             $data = $this->modelIndicator->getAll();
             if($data)
-                returnResponse(GET_REGISTIES_SUCCESSFULLY,'Indicador eliminado correctamente',$data);
+                returnResponse(GET_REGISTIES_SUCCESSFULLY,'Indicadores obtenido correctamente',$data);
             else
-                returnResponse(GET_DATA_NOT_COMPLETE,'No se pudo eliminar el indicador');
+                returnResponse(GET_DATA_NOT_COMPLETE,'No se pudo obtener los registros');
         }
 
-        public function getAllByProceso($id)
+        public function getAllByProceso($proceso,$id)
         {
-            $data = $this->modelIndicator->getAllByProceso($id);
+            if($proceso=='proceso')
+                $data = $this->modelIndicator->getAllByProceso($id);
+            else if($proceso=='subproceso')
+                $data = $this->modelIndicator->getAllBySubroceso($id);
             if($data)
-                returnResponse(GET_REGISTIES_SUCCESSFULLY,'Indicador eliminado correctamente',$data);
+                returnResponse(GET_REGISTIES_SUCCESSFULLY,'Indicadores obtenido correctamente',$data);
             else
-                returnResponse(GET_DATA_NOT_COMPLETE,'No se pudo eliminar el indicador');
+                returnResponse(GET_DATA_NOT_COMPLETE,'No se pudo obtener los registros');
         }
 
         public function addVariable()

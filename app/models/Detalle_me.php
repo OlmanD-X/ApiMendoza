@@ -9,12 +9,13 @@
                 throwError(CONNECTION_DATABASE_ERROR,$this->db->error);
         }
 
-        public function add($DET_OBJ_ID,$DET_OE_ID,$DET_PERS_ID){
+        public function add($DET_OBJ_ID,$DET_OE_ID,$DET_PERS_ID,$DET_ME_ID){
             try{
-                $this->db->query("INSERT INTO DET_MAPA_ESTRATEGICO (DET_OBJ_ID,DET_OE_ID,DET_PERS_ID) VALUES(:DET_OBJ_ID,:DET_OE_ID,:DET_PERS_ID)");
+                $this->db->query("INSERT INTO DET_MAPA_ESTRATEGICO (DET_OBJ_ID,DET_OE_ID,DET_PERS_ID,DET_ME_ID) VALUES(:DET_OBJ_ID,:DET_OE_ID,:DET_PERS_ID,:DET_ME_ID)");
                 $this->db->bind(':DET_OBJ_ID',$DET_OBJ_ID);
                 $this->db->bind(':DET_OE_ID',$DET_OE_ID);
                 $this->db->bind(':DET_PERS_ID',$DET_PERS_ID);
+                $this->db->bind(':DET_ME_ID',$DET_ME_ID);
                 if($this->db->execute()){
                     return true;                    
                 }else{
@@ -25,10 +26,10 @@
             }
         }
 
-        public function getAll($PERS_ID){
+        public function getAll($ME_ID){
             try {
-                $this->db->query("SELECT DET_ID,DET_OBJ_ID,DET_OE_ID,DET_PERS_ID FROM DET_MAPA_ESTRATEGICO WHERE DET_PERS_ID=:PERS_ID");
-                $this->db->bind(':PERS_ID',$PERS_ID);
+                $this->db->query("SELECT DET_ID,DET_OBJ_ID,DET_OE_ID,DET_PERS_ID FROM DET_MAPA_ESTRATEGICO WHERE DET_ME_ID=:DET_ME_ID");
+                $this->db->bind(':DET_ME_ID',$ME_ID);
                 return $this->db->getRegisties();
             } catch (\Throwable $th) {
                 return $th->getMessage();
@@ -71,6 +72,18 @@
                 }else{
                     return false;
                 }
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function validateIdObjetivo($idME,$idObj,$field)
+        {
+            try {
+                $this->db->query("SELECT DET_ID,DET_OBJ_ID,DET_OE_ID,DET_PERS_ID FROM DET_MAPA_ESTRATEGICO WHERE $field=:id AND DET_ME_ID=:DET_ME_ID");
+                $this->db->bind(':DET_ME_ID',$idME);
+                $this->db->bind(':id',$idObj);
+                return $this->db->getRegisty();
             } catch (\Throwable $th) {
                 return $th->getMessage();
             }

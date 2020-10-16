@@ -30,7 +30,7 @@
                 $bool= $this->db->execute();
                 if(!$bool)
                     return $bool;
-                $this->db->query("SELECT MAX(IND_ID) FROM INDICADORES");
+                $this->db->query("SELECT MAX(IND_ID) AS IND_ID FROM INDICADORES");
                 $id = $this->db->getRegisty();
                 foreach ($variables as $variable) {
                     $bool = $this->addVariable($variable->symbol,$variable->desc,$id->IND_ID);
@@ -259,6 +259,40 @@
                 $this->db->query("SELECT * FROM INDICADORES WHERE IND_NAME=:nombre AND IND_SUB_ID=:id");
                 $this->db->bind(':nombre',$nombre);
                 $this->db->bind(':id',$id);
+                $bool = $this->db->getRegisty();
+                if(is_object($bool))
+                    return true;
+                else
+                    return false;
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function getByNameEdit($nombre,$id,$idInd)
+        {
+            try {
+                $this->db->query("SELECT * FROM INDICADORES WHERE IND_NAME=:nombre AND IND_ID!=:idInd AND IND_PROC_ID=:id");
+                $this->db->bind(':nombre',$nombre);
+                $this->db->bind(':id',$id);
+                $this->db->bind(':idInd',$idInd);
+                $bool = $this->db->getRegisty();
+                if(is_object($bool))
+                    return true;
+                else
+                    return false;
+            } catch (\Throwable $th) {
+                return $th->getMessage();
+            }
+        }
+
+        public function getByName2Edit($nombre,$id,$idInd)
+        {
+            try {
+                $this->db->query("SELECT * FROM INDICADORES WHERE IND_NAME=:nombre AND IND_ID!=:idInd AND IND_SUB_ID=:id");
+                $this->db->bind(':nombre',$nombre);
+                $this->db->bind(':id',$id);
+                $this->db->bind(':idInd',$idInd);
                 $bool = $this->db->getRegisty();
                 if(is_object($bool))
                     return true;

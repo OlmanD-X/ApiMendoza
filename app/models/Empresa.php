@@ -49,10 +49,9 @@
     public function mdlEditarEmpresa($tabla, $datos, $id){
 
       try {
-        $this->db->query("UPDATE $tabla SET EMP_RS = :EMP_RS, EMP_RUC = :EMP_RUC, EMP_LOGO = :EMP_LOGO, EMP_ESTADO = :EMP_ESTADO WHERE EMP_ID = :EMP_ID");
+        $this->db->query("UPDATE $tabla SET EMP_RS = :EMP_RS, EMP_RUC = :EMP_RUC, EMP_ESTADO = :EMP_ESTADO WHERE EMP_ID = :EMP_ID");
         $this->db->bind(':EMP_RS', $datos["EMP_RS"]);
         $this->db->bind(':EMP_RUC', $datos["EMP_RUC"]);
-        $this->db->bind(':EMP_LOGO', $datos["EMP_LOGO"]);
         $this->db->bind(':EMP_ESTADO', $datos["EMP_ESTADO"]);
         $this->db->bind(':EMP_ID', $id);
         

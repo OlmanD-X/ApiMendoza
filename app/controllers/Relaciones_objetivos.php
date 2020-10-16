@@ -5,10 +5,13 @@
         }
 
         public function add(){
+            //* Validar que no se registre una relación doble vez por ejemplo Det1 -> O2 dos veces
+            //? Validar que no se registre una relación de un nivel superior a uno inferior por ejemplo del 1 al 4
+
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
             
-            $REL_OE_ID = $_POST['REL_OE_ID'];
+            $REL_OE_ID = $_POST['REL_OE_ID'] ?? NULL;
             $REL_OBJ_ID = $_POST['REL_OBJ_ID'] ?? NULL;
             $REL_DET_ID = $_POST['REL_DET_ID'] ?? NULL;
 
@@ -20,8 +23,8 @@
             }
         }
        
-        public function getAll(){
-            $data = $this->modelRelacion->getAll();
+        public function getAll($DET_ID){
+            $data = $this->modelRelacion->getAll($DET_ID);
             if(empty($data)){
                 throwError(GET_DATA_NOT_COMPLETE,'No existen registros');
             }
@@ -45,12 +48,13 @@
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
 
             $REL_ID = $_POST['REL_ID'];
-            $REL_OE_ID = $_POST['REL_OE_ID'];
+            $REL_OE_ID = $_POST['REL_OE_ID'] ?? NULL;
             $REL_OBJ_ID = $_POST['REL_OBJ_ID'] ?? NULL;
             $REL_DET_ID = $_POST['REL_DET_ID'] ?? NULL;
             //VALIDAR LOGO
 
             $update = $this->modelRelacion->update($REL_ID,$REL_OE_ID,$REL_OBJ_ID,$REL_DET_ID);
+
             if($update){
                 returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Datos actualizados exitosamente');
             }else{

@@ -25,9 +25,10 @@
             }
         }
 
-        public function getAll(){
+        public function getAll($param,$id){
             try {
-                $this->db->query("SELECT ME_CREATE_DATE,ME_PROC_ID,ME_SUB_ID FROM MAPA_ESTRATEGICO WHERE ME_ESTADO = '1'");
+                $this->db->query("SELECT ME_CREATE_DATE,ME_DISCHARGE_DATE,ME_PROC_ID,ME_SUB_ID FROM MAPA_ESTRATEGICO WHERE $param=:id AND ME_ESTADO = '1'");
+                $this->db->bind(':id',$id);
                 return $this->db->getRegisties();
             } catch (\Throwable $th) {
                 return $th->getMessage();
@@ -36,7 +37,7 @@
 
         public function getOne($ME_ID){
             try {
-                $this->db->query("SELECT ME_ID,ME_CREATE_DATE,ME_PROC_ID,ME_SUB_ID FROM MAPA_ESTRATEGICO WHERE ME_ID = :ME_ID");
+                $this->db->query("SELECT ME_ID,ME_CREATE_DATE,ME_DISCHARGE_DATE,ME_PROC_ID,ME_SUB_ID FROM MAPA_ESTRATEGICO WHERE ME_ID = :ME_ID");
                 $this->db->bind(':ME_ID',$ME_ID);
                 return $this->db->getRegisty();
             } catch (\Throwable $th) {
@@ -44,13 +45,11 @@
             }
         }
 
-        public function update($ME_ID,$ME_CREATE_DATE,$ME_PROC_ID,$ME_SUB_ID){
+        public function update($ME_ID,$ME_DISCHARGE_DATE){
             try {
-                $this->db->query("UPDATE MAPA_ESTRATEGICO SET ME_CREATE_DATE=:ME_CREATE_DATE, ME_PROC_ID=:ME_PROC_ID, ME_SUB_ID=:ME_SUB_ID WHERE ME_ID=:ME_ID");
+                $this->db->query("UPDATE MAPA_ESTRATEGICO SET ME_DISCHARGE_DATE=:ME_DISCHARGE_DATE WHERE ME_ID=:ME_ID");
                 $this->db->bind(':ME_ID',$ME_ID);
-                $this->db->bind(':ME_CREATE_DATE',$ME_CREATE_DATE);
-                $this->db->bind(':ME_PROC_ID',$ME_PROC_ID);
-                $this->db->bind(':ME_SUB_ID',$ME_SUB_ID);
+                $this->db->bind(':ME_DISCHARGE_DATE',$ME_DISCHARGE_DATE);
                 if($this->db->execute()){
                     return true;
                 }else{

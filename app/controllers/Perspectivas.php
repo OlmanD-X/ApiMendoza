@@ -11,7 +11,12 @@
             $PERS_NAME = validateAlfanumeric('perspectiva',validateParameter('Perspectiva', trim($_POST['PERS_NAME']),STRING),'Alfa');
             $PERS_ORDEN = $_POST['PERS_ORDEN'] ?? NULL;
             $PERS_ME_ID = $_POST['PERS_ME_ID'] ?? NULL;
-
+            $bool = $this->modelPers->validateName($PERS_NAME,$PERS_ME_ID);
+            if($bool)
+                throwError(INSERTED_DATA_NOT_COMPLETE,"La perspectiva $PERS_NAME ya existe");
+            $bool = $this->modelPers->validateLevel($PERS_ORDEN,$PERS_ME_ID);
+            if($bool)
+                throwError(INSERTED_DATA_NOT_COMPLETE,"El orden $PERS_ORDEN ya existe");
             $insert = $this->modelPers->add($PERS_NAME,$PERS_ORDEN,$PERS_ME_ID);
             if($insert){
                 returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Datos registrados exitosamente');
@@ -20,8 +25,8 @@
             }
         }
        
-        public function getAll(){
-            $data = $this->modelPers->getAll();
+        public function getAll($id){
+            $data = $this->modelPers->getAll($id);
             if(empty($data)){
                 throwError(GET_DATA_NOT_COMPLETE,'No existen registros');
             }
@@ -48,7 +53,8 @@
             $PERS_NAME = validateAlfanumeric('perspectiva',validateParameter('Perspectiva', trim($_POST['PERS_NAME']),STRING),'Alfa');
             $PERS_ORDEN = $_POST['PERS_ORDEN'] ?? NULL;
             $PERS_ME_ID = $_POST['PERS_ME_ID'] ?? NULL;
-            //VALIDAR LOGO
+            
+            //* Verificar si el id es el mismo que permita el registro del mismo dato
 
             $update = $this->modelPers->update($PERS_ID,$PERS_NAME,$PERS_ORDEN,$PERS_ME_ID);
             if($update){
@@ -56,6 +62,7 @@
             }else{
                 throwError(INSERTED_DATA_NOT_COMPLETE,'Se produjo un error al actualizar los datos');
             }
+
         }
         
         public function delete($PERS_ID){

@@ -15,7 +15,7 @@
         if($item != null){
           $this->db->query("SELECT * FROM $tabla WHERE $item = :$item ORDER BY OE_ID DESC");
           $this->db->bind(':'.$item, $valor);
-          return $this->db->getRegisty();
+          return $this->db->getRegisties();
         }else{
           $this->db->query("SELECT * FROM $tabla ORDER BY OE_ID DESC");
           return $this->db->getRegisties();
@@ -45,12 +45,11 @@
   
     }
 
-    public function mdlEditar_objEstrategico($tabla, $descripcion, $id_empresa, $id){
+    public function mdlEditar_objEstrategico($tabla, $descripcion, $id){
 
       try {
-        $this->db->query("UPDATE $tabla SET OE_DESC = :OE_DESC, OE_EMP_ID = :OE_EMP_ID WHERE OE_ID = :OE_ID");
+        $this->db->query("UPDATE $tabla SET OE_DESC = :OE_DESC WHERE OE_ID = :OE_ID");
         $this->db->bind(':OE_DESC', $descripcion);
-        $this->db->bind(':OE_EMP_ID', $id_empresa);
         $this->db->bind(':OE_ID', $id);
         
         if ( $this->db->execute() ){
@@ -83,15 +82,16 @@
   
     }
 
-    public function mdlVerificar_objEstrategicos($oe_desc, $id){
+    public function mdlVerificar_objEstrategicos($oe_desc,$idEmp, $id = null){
 
       try {
 
         if ( $id==null) {
-          $this->db->query("SELECT * FROM objetivos_estrategicos WHERE OE_DESC = :OE_DESC");
+          $this->db->query("SELECT * FROM objetivos_estrategicos WHERE OE_DESC = :OE_DESC AND OE_EMP_ID=:idEmp");
           $this->db->bind(':OE_DESC', $oe_desc);
-          
-          if ( count($this->db->getRegisties())>0 ){
+          $this->db->bind(':idEmp', $idEmp);
+          $obj = $this->db->getRegisty();
+          if (is_object($obj)){
             return "Hay datos";
           }else{
             return "No hay datos";

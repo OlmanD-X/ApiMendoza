@@ -25,9 +25,10 @@
             }
         }
 
-        public function getAll(){
+        public function getAll($DET_ID){
             try {
-                $this->db->query("SELECT REL_OE_ID,REL_OBJ_ID,REL_DET_ID FROM RELACIONES_OBJETIVOS");
+                $this->db->query("SELECT REL_OE_ID,REL_OBJ_ID,REL_DET_ID FROM RELACIONES_OBJETIVOS WHERE REL_DET_ID=:id");
+                $this->db->bind(':id',$DET_ID);
                 return $this->db->getRegisties();
             } catch (\Throwable $th) {
                 return $th->getMessage();
@@ -46,7 +47,7 @@
 
         public function update($REL_ID,$REL_OE_ID,$REL_OBJ_ID,$REL_DET_ID){
             try {
-                $this->db->query("UPDATE  SET REL_OE_ID=:REL_OE_ID, REL_OBJ_ID=:REL_OBJ_ID, REL_DET_ID=:REL_DET_ID WHERE REL_ID=:REL_ID");
+                $this->db->query("UPDATE RELACIONES_OBJETIVOS SET REL_OE_ID=:REL_OE_ID, REL_OBJ_ID=:REL_OBJ_ID, REL_DET_ID=:REL_DET_ID WHERE REL_ID=:REL_ID");
                 $this->db->bind(':REL_ID',$REL_ID);
                 $this->db->bind(':REL_OE_ID',$REL_OE_ID);
                 $this->db->bind(':REL_OBJ_ID',$REL_OBJ_ID);

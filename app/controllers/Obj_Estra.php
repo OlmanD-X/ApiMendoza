@@ -18,14 +18,13 @@
       if( isset($_POST["new_oeDesc"]) ){
 
         $OE_Desc = validateAlfaNumeric('Descripción Objetivo Estratégico.', $_POST["new_oeDesc"], 'Alfanumeric');
-
+        $IdEmpresa = $_POST["Id_Empresa"];
         //Hacemos la consulta para verificar que no haya datos repetidos.
-        $verificacion = $this->modelObjEstra->mdlVerificar_objEstrategicos($OE_Desc, null);
+        $verificacion = $this->modelObjEstra->mdlVerificar_objEstrategicos($OE_Desc,$IdEmpresa);
 
         if( $verificacion == "No hay datos" ){
 
           $tabla = "objetivos_estrategicos";
-          $IdEmpresa = $_POST["Id_Empresa"];
           $datos = array("OE_DESC" => $_POST["new_oeDesc"],
                   "OE_EMP_ID" => $IdEmpresa);
 
@@ -34,7 +33,7 @@
           if($respuesta == "ok"){
             returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Objetivo Estratégico creado correctamente");
           }else{
-            throwError(INSERTED_DATA_NOT_COMPLETE, "Error al registrar la Objetivo Estratégico.");
+            throwError(INSERTED_DATA_NOT_COMPLETE, "Error al registrar el Objetivo Estratégico.");
           }
 
         }else{
@@ -51,15 +50,15 @@
   
         $OE_Desc = validateAlfaNumeric('Descripción Objetivo Estratégico.', $_POST["edit_oeDesc"], 'Alfanumeric');
         $id = $_POST["Id_ObjEstra"];
-        $id_empresa = $_POST["edit_oeEmpId"];
+        $idEmp = $_POST["Id_Empresa"];
         //Hacemos la consulta para verificar que no haya datos repetidos.
-        $verificacion = $this->modelObjEstra->mdlVerificar_objEstrategicos($OE_Desc, $id);
+        $verificacion = $this->modelObjEstra->mdlVerificar_objEstrategicos($OE_Desc,$idEmp,$id);
         
         if( $verificacion == "Actualizar" ){
            
           $tabla = "objetivos_estrategicos";
           $descripcion = $_POST["edit_oeDesc"];
-          $respuesta = $this->modelObjEstra->mdlEditar_objEstrategico($tabla, $descripcion, $id_empresa, $id);
+          $respuesta = $this->modelObjEstra->mdlEditar_objEstrategico($tabla, $descripcion, $id);
 
           if($respuesta == "ok"){
             returnResponse(REGISTY_INSERT_SUCCESSFULLY, "Objetivo Estratégico actualizado correctamente.");

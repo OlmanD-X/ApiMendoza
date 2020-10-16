@@ -8,11 +8,27 @@
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
             
-            $DET_OBJ_ID = $_POST['DET_OBJ_ID'];
+            $DET_OBJ_ID = $_POST['DET_OBJ_ID']??NULL;
             $DET_OE_ID = $_POST['DET_OE_ID'] ?? NULL;
             $DET_PERS_ID = $_POST['DET_PERS_ID'] ?? NULL;
-
-            $insert = $this->modelDetalles->add($DET_OBJ_ID,$DET_OE_ID,$DET_PERS_ID);
+            $ME_ID = $_POST['ME_ID'] ?? NULL;
+            $type = $_POST['type'] ?? NULL;
+            $field = '';
+            $ID = '';
+            if($type == 'OP'){
+                $field = 'DET_OBJ_ID';
+                $ID = $DET_OBJ_ID;
+            }  
+            else if($type == 'OE'){
+                $field = 'DET_OE_ID';
+                $ID = $DET_OE_ID;
+            }
+            else if(is_null($type))
+                throwError(INSERTED_DATA_NOT_COMPLETE,'Especifique el tipo de objetivo');
+            $obj = $this->modelDetalles->validateIdObjetivo($ME_ID,$ID,$field);
+            if(is_object($obj))
+                throwError(INSERTED_DATA_NOT_COMPLETE,'El objetivo ya ha sido registrado en una perspectiva.');
+            $insert = $this->modelDetalles->add($DET_OBJ_ID,$DET_OE_ID,$DET_PERS_ID,$ME_ID);
             if($insert){
                 returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Datos registrados exitosamente');
             }else{
@@ -20,8 +36,8 @@
             }
         }
        
-        public function getAll($PERS_ID){
-            $data = $this->modelDetalles->getAll($PERS_ID);
+        public function getAll($idME){
+            $data = $this->modelDetalles->getAll($idME);
             if(empty($data)){
                 throwError(GET_DATA_NOT_COMPLETE,'No existen registros');
             }
@@ -45,7 +61,7 @@
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
 
             $DET_ID = $_POST['DET_ID'];
-            $DET_OBJ_ID = $_POST['DET_OBJ_ID'];
+            $DET_OBJ_ID = $_POST['DET_OBJ_ID'] ?? NULL;
             $DET_OE_ID = $_POST['DET_OE_ID'] ?? NULL;
             $DET_PERS_ID = $_POST['DET_PERS_ID'] ?? NULL;
             //VALIDAR LOGO

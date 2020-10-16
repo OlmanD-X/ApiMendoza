@@ -8,7 +8,7 @@
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
             
-            $ME_CREATE_DATE = $_POST['ME_CREATE_DATE'];
+            $ME_CREATE_DATE = date("Y-m-d H:i:s");
             $ME_PROC_ID = $_POST['ME_PROC_ID'] ?? NULL;
             $ME_SUB_ID = $_POST['ME_SUB_ID'] ?? NULL;
 
@@ -20,8 +20,16 @@
             }
         }
        
-        public function getAll(){
-            $data = $this->modelMapa->getAll();
+        public function getAll($type,$id){
+
+            if($type=='proceso')
+                $proceso = 'ME_PROC_ID';
+            else if($type == 'subproceso')
+                $proceso = 'ME_SUB_ID';
+            else
+                throwError(PARAMETER_IS_INVALID,'El parámetro no es válido');
+
+            $data = $this->modelMapa->getAll($proceso,$id);
             if(empty($data)){
                 throwError(GET_DATA_NOT_COMPLETE,'No existen registros');
             }
@@ -40,21 +48,18 @@
             }
         }
 
-        public function update(){
+        public function update($ME_ID){
             if($_SERVER['REQUEST_METHOD']!=='POST')
                 throwError(REQUEST_METHOD_NOT_VALID,'Método http no válido.');
 
-            $ME_ID = $_POST['ME_ID'];
-            $ME_CREATE_DATE = $_POST['ME_CREATE_DATE'];
-            $ME_PROC_ID = $_POST['ME_PROC_ID'] ?? NULL;
-            $ME_SUB_ID = $_POST['ME_SUB_ID'] ?? NULL;
-            //VALIDAR LOGO
+            $ME_DISCHARGE_DATE = date("Y-m-d H:i:s");
+            
 
-            $update = $this->modelMapa->update($ME_ID,$ME_CREATE_DATE,$ME_PROC_ID,$ME_SUB_ID);
+            $update = $this->modelMapa->update($ME_ID,$ME_DISCHARGE_DATE);
             if($update){
-                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Datos actualizados exitosamente');
+                returnResponse(REGISTY_INSERT_SUCCESSFULLY,'Mapa estratégico dado de baja exitosamente');
             }else{
-                throwError(INSERTED_DATA_NOT_COMPLETE,'Se produjo un error al actualizar los datos');
+                throwError(INSERTED_DATA_NOT_COMPLETE,'Se produjo un error al dar de baja el mapa estratégico');
             }
         }
         
