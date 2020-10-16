@@ -181,8 +181,8 @@
         return $value;
     }
 
-    function calcularResultado($variables){
-
+    function calcularResultado($formula,$variables){
+        $arrFormula = explode('',$formula);
         $respuesta = 1.0;
         for ($i=0; $i < count($variables); $i++) { 
             $respuesta = $respuesta*$variables[$i];
@@ -190,4 +190,15 @@
 
         return $respuesta/100;
 
+    }
+
+    function getBloques($cadena,$posActual){
+        if($posActual==count($cadena)-1)
+            return '';
+        else if($cadena[$posActual]=='(')
+            return ','.getBloques($cadena,$posActual++);
+        else if($cadena[$posActual]==')')
+            return ';'.getBloques($cadena,$posActual++);
+        else
+            return getBloques($cadena,$posActual++);
     }

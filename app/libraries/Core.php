@@ -9,6 +9,7 @@
             header('Access-Control-Allow-Headers:Authorization');
             header('Access-Control-Allow-Methods:GET,POST');
             header('Content-Type: application/json');
+            date_default_timezone_set("America/Lima");
             session_start();
             $url = $this->getUrl();
             if(isset($url[0])){
